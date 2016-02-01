@@ -1,0 +1,24 @@
+{
+  "name": "nukeData",
+  "authors": [
+    "austin <austin.cawley@gmail.com>"
+  ],
+  "description": "Graphics for US Nuke Data",
+  "main": ["js/nukeGraph.js", "index.html"],
+  "moduleType": [],
+  "keywords": [
+    "nuke",
+    "d3",
+    "visualization"
+  ],
+  "license": "MIT",
+  "homepage": "personal.stevens.edu/~acawleye",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
