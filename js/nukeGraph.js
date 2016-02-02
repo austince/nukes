@@ -11,7 +11,6 @@
 "use strict";
 
 var nukeData, presData;
-var statsList = [];
 
 var earthRadius = 5;
 var presMaxRadius = 300;
@@ -28,12 +27,11 @@ const PRES_IMG_PATH = "images/publicOpinion/";
 
 // Shorthand for document ready
 $(function() {
-    //makeGraph();
-    makeCircleGraph();
+    makeNukeGraph();
 });
 
 
-function makeCircleGraph() {
+function makeNukeGraph() {
     // First load all the data
     d3.csv("data/declassifiedStockpile.csv", function(err, nD){
         if (err != null) {
@@ -51,7 +49,7 @@ function makeCircleGraph() {
 
             // Now the  fun stuff
             // Setup the graph container
-            var graphContainer = d3.select(".nukeGraph");
+            var graphContainer = d3.select(".nukeGraphContainer");
 
             // Setup range input
             var range = graphContainer.append("input")
@@ -66,15 +64,15 @@ function makeCircleGraph() {
             });
 
 
-            var circleGraph = graphContainer.append("svg")
+            var nukeGraph = graphContainer.append("svg")
                 .attr("id", "nukeGraphSvg")
                 .attr("class", "graphArea");
 
-            circleGraph.append("title")
+            nukeGraph.append("title")
                 .text("nukes on nukes");
 
             // Create patterns for svg elements backgrounds
-            circleGraph.append("defs")
+            nukeGraph.append("defs")
                 .append('pattern')
                 .attr('id', 'nukeBg')
                 .attr('patternUnits', 'userSpaceOnUse')
@@ -87,18 +85,17 @@ function makeCircleGraph() {
                 .attr('width', 10)
                 .attr('height', 8);
 
-            var graphBounds = circleGraph.node().getBoundingClientRect();
-
+            var graphBounds = nukeGraph.node().getBoundingClientRect();
 
             // Add two circles: one for size of world that can be blown and one for reference
-            var nukeCircle = circleGraph.append("circle")
+            var nukeCircle = nukeGraph.append("circle")
                 .attr("id", "nukeCircle")
                 .attr("fill", "url(#nukeBg)")
                 .attr("cx", graphBounds.width/2)
                 .attr("cy", graphBounds.height/2)
                 .attr("r", 30);
 
-            var earthCirlce = circleGraph.append("circle")
+            var earthCirlce = nukeGraph.append("circle")
                 .attr("id", "earthCircle")
                 .attr("fill", "green")
                 .attr("cx", 20 + earthRadius)
@@ -138,7 +135,7 @@ function update(year) {
     // Update the year text
     d3.select("#yearBox").text(year);
 
-    // Search both datasources
+    // Search both data sources
     var yearNukeData = $.grep(nukeData, function(obj) {
         return obj[YEAR_KEY] === year;
     })[0];
@@ -182,19 +179,10 @@ function update(year) {
     stats["% Unsure: "] = (yearPresData[AVG_UNSURE_KEY] * 100).toFixed(2);
     stats["% Disapprove: "] = (yearPresData[AVG_DISAPPR_KEY] * 100).toFixed(2);
 
-    refreshStats(stats);
-
-   /* console.log("Year: " + year);
-    console.log("Megatonnage: " + yearNukeData[MEGATON_KEY]);
-    console.log("# Earths killed: " + potentialNukeRadius / earthRadius);*/
-}
-
-function refreshStats(stats) {
     // Really roundabout way to do this, just trying to get accustomed to the d3 databinding
     var header = $("#statsBox h2").detach();
     // Empty all children then re-add the header. oops.
     $("#statsBox").empty().append(header);
-
     // Build a 'tuple' list for d3 data binding
     var statsList = [];
     for (var key in stats) {
@@ -210,7 +198,10 @@ function refreshStats(stats) {
     var boxUpdate = boxes.data(statsList);
     var boxEnter = boxUpdate.enter().append("p");
     boxEnter.text(function(datum) { return datum[0] + ": " + datum[1]; });
-    var boxExit = boxUpdate.exit().remove();
+
+   /* console.log("Year: " + year);
+    console.log("Megatonnage: " + yearNukeData[MEGATON_KEY]);
+    console.log("# Earths killed: " + potentialNukeRadius / earthRadius);*/
 }
 
 /** Resize the svg graph, aka the nuke circle. The little guy is so static sometimes. */
@@ -224,23 +215,4 @@ $(window).resize(function() {
 /** Could eventually hold the tether-shepherd guided tour. If we want to get fancy. Nah. */
 function walkthrough() {
 
-}
-
-/** This is an example from the d3.js tutorial. Graphs are cool. */
-var data = [4, 8, 15, 16, 23, 42];
-function makeGraph() {
-    var graph = d3.select(".graph");
-
-    // All bars will be divs inside the graph element
-    var bar = graph.selectAll("div");
-    // Bind the data to the bars
-    var barUpdate = bar.data(data);
-    // For every data w/in the dataset, add a div to the graph
-    var barEnter = barUpdate.enter().append("div");
-    // Scale each piece of data
-    var barWidth = d3.scale.linear()
-        .domain([0, d3.max(data)])
-        .range([0, $(window).width() *.95]);
-    barEnter.style("width", function(x) { return barWidth(x) + "px";});
-    barEnter.text(function(x) { return x; });
 }
